@@ -14,6 +14,7 @@ module.exports.list = function(req, res, next) {
 
 module.exports.show = function(req, res) {
   const id = req.params.id
+  console.log(req.params.id)
   Article.findOne({ _id: id }, function(err, article) {
     if (err) {
       return res.status(500).json({

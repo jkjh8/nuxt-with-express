@@ -69,10 +69,13 @@ export default {
       }
     },
     redirect: {
-      login: '/users/login',
+      login: '/user/login',
       logout: '/',
       home: '/'
     },
     rewriteRedirects: true
-  }
+  },
+  serverMiddleware: [
+    '~/api/index.js'
+  ]
 }
