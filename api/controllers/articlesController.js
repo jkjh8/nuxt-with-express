@@ -69,5 +69,49 @@ module.exports.create = [
 ]
 
 module.exports.update = [
-  
+  validator.body('title', 'Plase enter Article Title'),
+  validator.body('title').custom((value, {req}) => {
+    return Article.findOne({ title: value, _id:{ $ne: req.params.id } })
+      .then(article => {
+        if (article !== null) {
+          return Promise.reject('Title already in use')
+        }
+    })
+  }),
+  validator.body('author', 'Please enter Author Name').isLength({ min: 1 }),
+  validator.body('body', 'Please enter Article Content').isLength({ min: 1 }),
+
+  function(req, res) {
+    const errors = validator.validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.mapped() })
+    }
+
+    const id = req.params.id
+    Article.findOne({ _id: id }, function(err, article) {
+      if (err) {
+        return res.status(500).json({
+          message: 'Error getting record'
+        })
+      }
+      if(!article) {
+        return res.status(400).json({
+          message: 'No such record'
+        })
+      }
+      return res.json(article)
+    })
+  }
 ]
+
+module.exports.delete = function(req, res) {
+  const id = req.params.id
+  Article.findByIdAndRemove(id, function(err, article) {
+    if (err) {
+      return res.status(500).json({
+        message: 'Error getting record'
+      })
+    }
+    return res.json(article)
+  })
+}
